@@ -20,7 +20,12 @@ class HeaderFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?) : View?
     {
-        return inflater.inflate(R.layout.header_fragment, container)
+        val view = inflater.inflate(R.layout.header_fragment, container)
+        coroutineScope.launch {
+            val name: String? = Api.userService.getInfo().body()?.firstname
+            view.user_name.text = name
+        }
+        return view
     }
 
     override fun onResume() {
