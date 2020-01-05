@@ -12,14 +12,17 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.bumptech.glide.Glide
-import com.example.td2.network.Api
+import com.example.dm_project.network.API
+//import com.example.td2.network.Api
 import kotlinx.android.synthetic.main.activity_user_info.*
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import kotlinx.io.IOException
-import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MediaType
+//import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
-import okhttp3.RequestBody.Companion.asRequestBody
+import okhttp3.RequestBody
+//import okhttp3.RequestBody.Companion.asRequestBody
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.FileOutputStream
@@ -38,7 +41,7 @@ class UserInfoActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main.xml)
+        setContentView(R.layout.activity_main)
         take_picture_button.setOnClickListener {
             askCameraPermissionAndOpenCamera()
         }
@@ -113,7 +116,7 @@ class UserInfoActivity : AppCompatActivity() {
 
         if(imageBody == null) return
         MainScope().launch {
-            Api.INSTANCE.userService.updateAvatar(imageBody)
+            API.INSTANCE.userService.updateAvatar(imageBody)
         }
 
     }
@@ -135,7 +138,8 @@ class UserInfoActivity : AppCompatActivity() {
 
         }
 
-        val body = f.asRequestBody("image/png".toMediaTypeOrNull())
+        val body = RequestBody.create(MediaType.parse("image/png"), f)
+        //val body = f.asRequestBody("image/png".toMediaTypeOrNull())
         return MultipartBody.Part.createFormData("avatar", f.path ,body)
     }
 }

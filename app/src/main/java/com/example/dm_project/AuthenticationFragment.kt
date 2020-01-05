@@ -6,8 +6,9 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
-import com.example.td2.R
-import kotlinx.android.synthetic.main.fragment_authentication.*
+//import com.example.td2.R
+import kotlinx.android.synthetic.main.authentication_fragment.*
+//import kotlinx.android.synthetic.main.fragment_authentication.*
 
 
 class AuthenticationFragment : Fragment() {
