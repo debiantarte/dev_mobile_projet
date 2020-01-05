@@ -29,11 +29,19 @@ class HeaderFragment : Fragment() {
     }
 
     override fun onResume() {
-        super.onResume()
         coroutineScope.launch {
+            Glide.with(this).load("https://goo.gl/gEgYUd").into(image_view)
             val info = API.userService.getInfo()
             view?.findViewById<TextView>(R.id.headerText)?.text = info.body()?.email.toString()
         }
+
+        user_avatar.isClickable = true
+        user_avatar.setOnClickListener {
+            val selectAvatarIntent = Intent(activity?.baseContext, UserInfoActivity::class.java)
+            startActivity(selectAvatarIntent)
+        }
+
+        super.onResume()
     }
 
     override fun onDestroy() {

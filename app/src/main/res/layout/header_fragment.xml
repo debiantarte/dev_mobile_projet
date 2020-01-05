@@ -9,4 +9,11 @@
         android:layout_height="wrap_content"
         android:text="Hello World!" />
 
+    <ImageView
+        android:id="@+id/user_avatar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:contentDescription="@string/user_avatar"
+        tools:srcCompat="@tools:sample/avatars" />
+
 </LinearLayout>
