@@ -1,3 +1,13 @@
 <resources>
     <string name="app_name">DM-Project</string>
+    <string name="user_avatar">user avatar</string>
+    <string name="choose_picture">Choose Picture</string>
+    <string name="take_picture">Take Picture</string>
+    <string name="loading_message">Loading...</string>
+
+    <string name="sign_in">Sign In</string>
+    <string name="sign_up">Sign Up</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="firstname">Firstname</string>
 </resources>
