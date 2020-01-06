@@ -7,15 +7,6 @@
     android:layout_height="match_parent"
     tools:context=".SignupFragment">
 
-    <EditText
-        android:id="@+id/password_confirmation"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:hint="Confirm password"
-        android:inputType="textPassword"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/password" />
 
     <EditText
         android:id="@+id/firstname"
@@ -55,6 +46,16 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/email" />
+
+    <EditText
+        android:id="@+id/password_confirmation"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:hint="Confirm password"
+        android:inputType="textPassword"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/password" />
 
     <Button
         android:id="@+id/button3"
