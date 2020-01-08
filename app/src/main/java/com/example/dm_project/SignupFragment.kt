@@ -10,8 +10,6 @@ import android.widget.Toast
 import androidx.core.content.edit
 import androidx.fragment.app.Fragment
 import com.example.dm_project.network.API
-import com.example.dm_project.network.UserInfo
-import kotlinx.android.synthetic.main.authentication_fragment.*
 import kotlinx.android.synthetic.main.signup_fragment.*
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch

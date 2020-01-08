@@ -8,6 +8,5 @@ class TaskViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     fun bind(task: Task) {
         itemView.task_title.text = task.title
         itemView.task_description.text = task.description
-        //itemView.task_id.text = task.id
     }
 }

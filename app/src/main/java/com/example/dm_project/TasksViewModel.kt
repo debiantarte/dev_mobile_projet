@@ -5,7 +5,6 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import com.example.dm_project.network.TasksRepository
-//import com.example.td2.network.TaskRepository
 
 class TasksViewModel : ViewModel(){
     private val repository = TasksRepository()

@@ -8,10 +8,6 @@ import android.os.Bundle
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.bumptech.glide.Glide
-import com.example.dm_project.network.UserService
-import kotlinx.android.synthetic.main.activity_user_info.*
-import kotlinx.android.synthetic.main.header_fragment.*
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -36,9 +32,4 @@ class MainActivity : AppCompatActivity() {
             startActivity(taskFormIntent)
         }
     }
-
-  /*  override fun onResume() {
-        super.onResume()
-        Glide.with(this).load(current_avatar).into(user_avatar)
-    }*/
 }

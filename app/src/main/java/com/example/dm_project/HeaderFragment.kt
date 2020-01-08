@@ -9,7 +9,6 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
 import com.example.dm_project.network.API
-import com.example.dm_project.network.UserInfo
 import kotlinx.android.synthetic.main.header_fragment.*
 import kotlinx.android.synthetic.main.header_fragment.view.*
 import kotlinx.coroutines.MainScope

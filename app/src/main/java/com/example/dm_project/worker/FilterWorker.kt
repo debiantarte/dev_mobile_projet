@@ -1,22 +1,10 @@
-package com.example.myapplicationtest.worker
+package com.example.dm_project.worker
 
 import android.content.Context
 import android.graphics.Bitmap
-import androidx.work.Data
 import androidx.work.Worker
 import androidx.work.WorkerParameters
 import com.bumptech.glide.Glide
-import com.example.dm_project.network.API
-import com.example.dm_project.network.App
-import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.launch
-import kotlinx.io.IOException
-import okhttp3.MediaType
-import okhttp3.MultipartBody
-import okhttp3.RequestBody
-import java.io.File
-import java.io.FileNotFoundException
-import java.io.FileOutputStream
 
 const val KEY_IMAGE_URI = "IMAGE_URI"
 

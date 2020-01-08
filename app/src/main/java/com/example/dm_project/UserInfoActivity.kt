@@ -16,8 +16,8 @@ import androidx.work.Data
 import androidx.work.OneTimeWorkRequest
 import com.bumptech.glide.Glide
 import com.example.dm_project.network.API
-import com.example.myapplicationtest.worker.FilterWorker
-import com.example.myapplicationtest.worker.KEY_IMAGE_URI
+import com.example.dm_project.worker.FilterWorker
+import com.example.dm_project.worker.KEY_IMAGE_URI
 import kotlinx.android.synthetic.main.activity_user_info.*
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch

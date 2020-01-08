@@ -10,16 +10,8 @@ import android.widget.Toast
 import androidx.core.content.edit
 import androidx.fragment.app.Fragment
 import com.example.dm_project.network.API
-//import com.example.td2.MainActivity
-//import com.example.td2.R
-//import com.example.td2.SHARED_PREF_TOKEN_KEY
-//import com.example.td2.network.Api
-//import com.example.td2.network.login
-//import kotlinx.android.synthetic.main.fragment_login.*
 import kotlinx.android.synthetic.main.login_fragment.*
-import com.example.dm_project.network.UserService
 import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 
 
