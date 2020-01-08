@@ -27,7 +27,7 @@ class FilterWorker(val context: Context, workerParams: WorkerParameters) : Worke
         val bitmap = Glide.with(this.context).load(imageUriString) as? Bitmap
 
         if (bitmap == null) throw Exception("No avatar found!")
-        val filteredBitmap = toSepia(bitmap!!)
+        val filteredBitmap = toSepia(bitmap)
 
         //write filteredBitmap on a file and output uri
 
@@ -40,7 +40,7 @@ class FilterWorker(val context: Context, workerParams: WorkerParameters) : Worke
 
 
 
-    fun toSepia(color: Bitmap): Bitmap {
+    private fun toSepia(color: Bitmap): Bitmap {
         var red: Int
         var green: Int
         var blue: Int

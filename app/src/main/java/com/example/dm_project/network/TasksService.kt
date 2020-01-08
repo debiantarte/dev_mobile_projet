@@ -2,7 +2,7 @@ package com.example.dm_project.network
 
 import com.example.dm_project.Task
 import retrofit2.Response
-import retrofit2.http.GET
+import retrofit2.http.*
 
 interface TasksService {
     @GET("tasks")

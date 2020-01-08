@@ -5,21 +5,26 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.work.Data
+import androidx.work.OneTimeWorkRequest
 import com.bumptech.glide.Glide
-import com.example.td2.network.Api
+import com.example.dm_project.network.API
+import com.example.myapplicationtest.worker.FilterWorker
+import com.example.myapplicationtest.worker.KEY_IMAGE_URI
 import kotlinx.android.synthetic.main.activity_user_info.*
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import kotlinx.io.IOException
-import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MediaType
 import okhttp3.MultipartBody
-import okhttp3.RequestBody.Companion.asRequestBody
+import okhttp3.RequestBody
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.FileOutputStream
@@ -38,7 +43,7 @@ class UserInfoActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main.xml)
+        setContentView(R.layout.activity_user_info)
         take_picture_button.setOnClickListener {
             askCameraPermissionAndOpenCamera()
         }
@@ -101,19 +106,13 @@ class UserInfoActivity : AppCompatActivity() {
         val inputStream: InputStream? = contentResolver.openInputStream(data.data!!)
         val bmp = BitmapFactory.decodeStream(inputStream)
 
+        buildSepiaFilterRequests(data)
 
-
-    }
-
-    private fun handlePhotoTaken(data: Intent?) {
-        val image = data?.extras?.get("data") as? Bitmap
-        val imageBody = imageToBody(image)
-
-        Glide.with(this).load(image).fitCenter().into(current_avatar)
-
-        if(imageBody == null) return
+        Glide.with(this).load(bmp).fitCenter().into(current_avatar)
+        val imageBody = imageToBody(bmp)
+        if (imageBody == null) return
         MainScope().launch {
-            Api.INSTANCE.userService.updateAvatar(imageBody)
+            API.INSTANCE.userService.updateAvatar(imageBody)
         }
 
     }
@@ -135,7 +134,44 @@ class UserInfoActivity : AppCompatActivity() {
 
         }
 
-        val body = f.asRequestBody("image/png".toMediaTypeOrNull())
+        val body = RequestBody.create(MediaType.parse("image/png"), f)
+        //val body = f.asRequestBody("image/png".toMediaTypeOrNull())
         return MultipartBody.Part.createFormData("avatar", f.path ,body)
     }
+
+    private fun handlePhotoTaken(data: Intent?) {
+        val image = data?.extras?.get("data") as? Bitmap
+        if (data == null) return
+        buildSepiaFilterRequests(data)
+        Glide.with(this).load(image).fitCenter().into(current_avatar)
+        val imageBody = imageToBody(image)
+        if (imageBody == null) return
+        MainScope().launch {
+            API.INSTANCE.userService.updateAvatar(imageBody)
+        }
+    }
+
+    private fun buildSepiaFilterRequests(intent: Intent): List<OneTimeWorkRequest> {
+        val filterRequests = mutableListOf<OneTimeWorkRequest>()
+
+        intent.data?.run {
+            val filterWorkRequest = OneTimeWorkRequest.Builder(FilterWorker::class.java)
+                .setInputData(buildInputDataForFilter(this))
+                .build()
+
+            filterRequests.add(filterWorkRequest)
+        }
+
+        return filterRequests
+    }
+
+    private fun buildInputDataForFilter(imageUri: Uri?): Data {
+        val builder = Data.Builder()
+        if (imageUri != null) {
+            builder.putString(KEY_IMAGE_URI, imageUri.toString())
+        }
+        return builder.build()
+    }
+
+
 }

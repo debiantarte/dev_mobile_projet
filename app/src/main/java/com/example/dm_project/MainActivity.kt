@@ -1,11 +1,17 @@
 package com.example.dm_project
 
 import android.Manifest
+import android.content.Intent
 import android.content.pm.PackageManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.bumptech.glide.Glide
+import com.example.dm_project.network.UserService
+import kotlinx.android.synthetic.main.activity_user_info.*
+import kotlinx.android.synthetic.main.header_fragment.*
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -31,9 +37,8 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    /*override fun onSaveInstanceState(outState: Bundle, outPersistentState: PersistableBundle) {
-        val removedArray : IntArray? = outState.getIntArray("removed_list")
-        outState.putIntArray("removed_list", removedArray)
-        super.onSaveInstanceState(outState, outPersistentState)
+  /*  override fun onResume() {
+        super.onResume()
+        Glide.with(this).load(current_avatar).into(user_avatar)
     }*/
 }

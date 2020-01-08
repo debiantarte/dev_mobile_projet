@@ -6,7 +6,8 @@ import android.os.Bundle
 import android.widget.Button
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import com.example.td2.network.Api
+import com.example.dm_project.network.API
+//import com.example.td2.network.Api
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 
@@ -16,7 +17,7 @@ class TaskFormActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_task_form)
+        setContentView(R.layout.task_form_activity)
 
         val button = findViewById<Button>(R.id.back)
         button.setOnClickListener{
@@ -25,7 +26,7 @@ class TaskFormActivity : AppCompatActivity() {
             val description = findViewById<TextView>(R.id.description).text.toString()
 
             coroutineScope.launch {
-                Api.taskService.createTask(Task("id_$title", title, description))
+                API.INSTANCE.tasksService.createTask(Task("id_$title", title, description))
             }
             startActivity(createActivityIntent)
         }

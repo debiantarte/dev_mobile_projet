@@ -5,14 +5,19 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.LayoutInflater
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.dm_project.network.TasksRepository
 import kotlinx.android.synthetic.main.tasks_fragment.view.*
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.cancel
 
 class TasksFragment : Fragment(){
     private val coroutineScope = MainScope()
-    private val tasksRepository = TaskRepository()
+    private val tasksRepository = TasksRepository()
     private val tasks = mutableListOf<Task>()
-    private val taskAdapter = TaskAdapter(tasks)
+    private val taskAdapter = TasksAdapter(tasks)
     private val taskViewModel by lazy { ViewModelProviders.of(this).get(TasksViewModel::class.java)}
 
     override fun onCreateView(

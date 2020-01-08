@@ -2,12 +2,12 @@ package com.example.dm_project.network
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.example.td2.Task
+import com.example.dm_project.Task
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 
 class TasksRepository {
-    private val tasksService = Api.taskService
+    private val tasksService = API.INSTANCE.tasksService
     private val coroutineScope = MainScope()
 
 
