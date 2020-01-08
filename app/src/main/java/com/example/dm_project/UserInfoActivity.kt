@@ -33,8 +33,6 @@ import java.io.InputStream
 
 class UserInfoActivity : AppCompatActivity() {
 
-
-
     companion object {
         const val CAMERA_PERMISSION_CODE = 1000
         const val CAMERA_REQUEST_CODE = 2001

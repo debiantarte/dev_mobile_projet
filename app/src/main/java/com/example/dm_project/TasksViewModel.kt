@@ -19,7 +19,7 @@ class TasksViewModel : ViewModel(){
                 tasks.clear()
                 tasks.addAll(it)
                 tasksAdapter.notifyDataSetChanged()
-
-            })
+            }
+        )
     }
 }

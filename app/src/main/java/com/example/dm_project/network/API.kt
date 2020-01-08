@@ -12,7 +12,7 @@ class API(private val context: Context) {
 
     companion object {
         private const val BASE_URL = "https://android-tasks-api.herokuapp.com/api/"
-        private const val TOKEN = "eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxODYsImV4cCI6MTYwOTkzMjc3NH0.8HgIOHAJyGWaTN_1PmYkPhK5UcBjAEPg2_3HfC2gX3Y"
+        //private const val TOKEN = "eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxODYsImV4cCI6MTYwOTkzMjc3NH0.8HgIOHAJyGWaTN_1PmYkPhK5UcBjAEPg2_3HfC2gX3Y"
         lateinit var INSTANCE: API
     }
 
@@ -22,7 +22,7 @@ class API(private val context: Context) {
         OkHttpClient.Builder().addInterceptor {
                 chain ->
                     val newRequest = chain.request().newBuilder()
-                    .addHeader("Authorization", "Bearer $TOKEN")
+                    .addHeader("Authorization", "Bearer ${getToken()}")
                     .build()
                     chain.proceed(newRequest)
         }.build()

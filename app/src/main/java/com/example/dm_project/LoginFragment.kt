@@ -41,7 +41,7 @@ class LoginFragment : Fragment() {
                 LoginForm(email.text.toString(), password.text.toString()))
             if (response.isSuccessful)
             {
-                displayTasks(response.toString())
+                displayTasks(response?.body()?.token)
             }
             else
             {
@@ -50,14 +50,14 @@ class LoginFragment : Fragment() {
         }
     }
 
-    private fun storeToken(token: String)
+    private fun storeToken(token: String?)
     {
         PreferenceManager.getDefaultSharedPreferences(context).edit {
             putString(SHARED_PREF_TOKEN_KEY, token)
         }
     }
 
-    private fun displayTasks(token: String)
+    private fun displayTasks(token: String?)
     {
         storeToken(token)
         val intent = Intent(activity?.applicationContext, MainActivity::class.java)

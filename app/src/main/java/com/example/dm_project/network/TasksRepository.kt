@@ -13,7 +13,9 @@ class TasksRepository {
 
     fun getTasks(): LiveData<List<Task>?> {
         val tasks = MutableLiveData<List<Task>?>()
-        coroutineScope.launch { tasks.postValue( loadTasks()) }
+        coroutineScope.launch {
+            val taskList = loadTasks()
+            tasks.postValue( loadTasks()) }
         return tasks
     }
 

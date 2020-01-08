@@ -4,6 +4,9 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
+import com.example.dm_project.network.API
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.launch
 
 class TasksAdapter(private val tasks: MutableList<Task>) : RecyclerView.Adapter<TaskViewHolder>() {
     override fun getItemCount(): Int {
@@ -26,6 +29,10 @@ class TasksAdapter(private val tasks: MutableList<Task>) : RecyclerView.Adapter<
     {
         val position = tasks.indexOf(task)
         tasks.remove(task)
+        val title = tasks[position].title
+        MainScope().launch {
+            API.INSTANCE.tasksService.deleteTask("id_$title")
+        }
         notifyItemRemoved(position)
         notifyItemRangeChanged(position, tasks.size)
     }
