@@ -28,10 +28,10 @@ class TasksAdapter(private val tasks: MutableList<Task>) : RecyclerView.Adapter<
     fun onDeleteClickListener(task: Task)
     {
         val position = tasks.indexOf(task)
+        //val title = tasks[position].title
         tasks.remove(task)
-        val title = tasks[position].title
         MainScope().launch {
-            API.INSTANCE.tasksService.deleteTask("id_$title")
+            API.INSTANCE.tasksService.deleteTask(task.id)
         }
         notifyItemRemoved(position)
         notifyItemRangeChanged(position, tasks.size)

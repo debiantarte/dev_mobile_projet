@@ -20,7 +20,7 @@ class TaskFormActivity : AppCompatActivity() {
 
         val button = findViewById<Button>(R.id.back)
         button.setOnClickListener{
-            val createActivityIntent : Intent = Intent(this, MainActivity::class.java)
+            val createActivityIntent = Intent(this, MainActivity::class.java)
             val title = findViewById<TextView>(R.id.title).text.toString()
             val description = findViewById<TextView>(R.id.description).text.toString()
 
