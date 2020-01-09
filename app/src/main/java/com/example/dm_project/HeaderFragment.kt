@@ -27,15 +27,18 @@ class HeaderFragment : Fragment() {
         coroutineScope.launch {
             val name: String? = API.INSTANCE.userService.getInfo().body()?.firstName
             view.headerText.text = name
+            val url = API.INSTANCE.userService.getInfo().body()?.avatar?: "https://goo.gl/gEgYUd"
+            Glide.with(this@HeaderFragment).load(url).fitCenter().circleCrop().into(user_avatar)
         }
         return view
     }
 
     override fun onResume() {
-        Glide.with(this).load("https://goo.gl/gEgYUd").into(user_avatar)
         coroutineScope.launch {
             val info = API.INSTANCE.userService.getInfo()
             view?.findViewById<TextView>(R.id.headerText)?.text = info.body()?.email.toString()
+            val url = info.body()?.avatar?: "https://goo.gl/gEgYUd"
+            Glide.with(this@HeaderFragment).load(url).fitCenter().circleCrop().into(user_avatar)
         }
 
         user_avatar.isClickable = true

@@ -106,7 +106,7 @@ class UserInfoActivity : AppCompatActivity() {
 
         buildSepiaFilterRequests(data)
 
-        Glide.with(this).load(bmp).fitCenter().into(current_avatar)
+        Glide.with(this).load(bmp).fitCenter().circleCrop().into(current_avatar)
         val imageBody = imageToBody(bmp)
         if (imageBody == null) return
         MainScope().launch {
@@ -141,7 +141,7 @@ class UserInfoActivity : AppCompatActivity() {
         val image = data?.extras?.get("data") as? Bitmap
         if (data == null) return
         buildSepiaFilterRequests(data)
-        Glide.with(this).load(image).fitCenter().into(current_avatar)
+        Glide.with(this).load(image).fitCenter().circleCrop().into(current_avatar)
         val imageBody = imageToBody(image)
         if (imageBody == null) return
         MainScope().launch {
