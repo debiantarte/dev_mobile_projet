@@ -2,9 +2,20 @@ package com.example.dm_project.worker
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.Color
+import android.media.effect.EffectFactory
+import android.net.Uri
+import android.preference.PreferenceManager
+import android.provider.MediaStore
+import androidx.work.Data
 import androidx.work.Worker
 import androidx.work.WorkerParameters
 import com.bumptech.glide.Glide
+import com.example.dm_project.network.API
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.launch
+import java.io.ByteArrayOutputStream
 
 const val KEY_IMAGE_URI = "IMAGE_URI"
 
@@ -12,56 +23,68 @@ class FilterWorker(val context: Context, workerParams: WorkerParameters) : Worke
 
     override fun doWork(): Result = try {
         val imageUriString = inputData.getString(KEY_IMAGE_URI)
-        val bitmap = Glide.with(this.context).load(imageUriString) as? Bitmap
+
+        val bitmap = MediaStore.Images.Media.getBitmap(applicationContext.contentResolver, Uri.parse(imageUriString))
 
         if (bitmap == null) throw Exception("No avatar found!")
         val filteredBitmap = toSepia(bitmap)
 
-        //write filteredBitmap on a file and output uri
+        val compressedBmp = getResizedBitmap(filteredBitmap, 150)
 
-        Result.success()
+        /* Bitmap -> Compressed ByteArray */
+        val baos = ByteArrayOutputStream()
+        compressedBmp.compress(Bitmap.CompressFormat.JPEG, 10, baos)
+
+        val byteArray = baos.toByteArray()
+
+        println(byteArray.size)
+
+        val output = Data.Builder().putByteArray("SEPIA_FILTERED_BYTEARRAY", byteArray).build()
+
+        Result.success(output)
     }
     catch (e: Throwable) {
         println(e.message)
         Result.failure()
     }
 
+    fun getResizedBitmap(image: Bitmap, maxSize: Int): Bitmap {
+        var width = image.width
+        var height = image.height
 
-
-    private fun toSepia(color: Bitmap): Bitmap {
-        var red: Int
-        var green: Int
-        var blue: Int
-        var pixel: Int
-        val height = color.height
-        val width = color.width
-        val depth = 20
-
-        val sepia = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
-
-        val pixels = IntArray(width * height)
-        color.getPixels(pixels, 0, width, 0, 0, width, height)
-        for (i in pixels.indices) {
-            pixel = pixels[i]
-
-            red = pixel shr 16 and 0xFF
-            green = pixel shr 8 and 0xFF
-            blue = pixel and 0xFF
-
-            blue = (red + green + blue) / 3
-            green = blue
-            red = green
-
-            red += depth * 2
-            green += depth
-
-            if (red > 255)
-                red = 255
-            if (green > 255)
-                green = 255
-            pixels[i] = 0xFF shl 24 or (red shl 16) or (green shl 8) or blue
+        val bitmapRatio = width.toFloat() / height.toFloat()
+        if (bitmapRatio > 1) {
+            width = maxSize
+            height = (width / bitmapRatio).toInt()
+        } else {
+            height = maxSize
+            width = (height * bitmapRatio).toInt()
         }
-        sepia.setPixels(pixels, 0, width, 0, 0, width, height)
+        return Bitmap.createScaledBitmap(image, width, height, true)
+    }
+
+    private fun toSepia(original: Bitmap): Bitmap {
+        val height = original.height
+        val width = original.width
+
+        val sepia = original.copy(Bitmap.Config.RGB_565, true)
+
+        for (i in 0 until width){
+            for (j in 0 until height){
+                val oldPixel = original.getPixel(i, j)
+                val oldRed = Color.red(oldPixel)
+                val oldGreen = Color.green(oldPixel)
+                val oldBlue = Color.blue(oldPixel)
+
+                val newRed = 0.393f * oldRed + 0.769f * oldGreen + 0.189f * oldBlue
+                val newGreen = 0.349f * oldRed + 0.686f * oldGreen + 0.168f * oldBlue
+                val newBlue = 0.272f * oldRed + 0.534f * oldGreen + 0.131f * oldBlue
+
+                val newPixel = Color.rgb(newRed, newGreen, newBlue)
+                sepia.setPixel(i, j, newPixel)
+            }
+        }
+
         return sepia
     }
 }

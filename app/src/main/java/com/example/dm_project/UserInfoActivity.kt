@@ -12,8 +12,10 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.Observer
 import androidx.work.Data
 import androidx.work.OneTimeWorkRequest
+import androidx.work.WorkManager
 import com.bumptech.glide.Glide
 import com.example.dm_project.network.API
 import com.example.dm_project.worker.FilterWorker
@@ -93,25 +95,46 @@ class UserInfoActivity : AppCompatActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
+        if (data == null) return
         if(requestCode == CAMERA_REQUEST_CODE)
             handlePhotoTaken(data)
         else
             handlePictureChosen(data)
+        val workManager = WorkManager.getInstance()
+        val applySepiaFilter = buildSepiaFilterRequest(data)
+
+        workManager.enqueue(applySepiaFilter)
+
+        workManager.getWorkInfoByIdLiveData(applySepiaFilter.id)
+            .observe(this, Observer { info ->
+                if (info != null && info.state.isFinished) {
+                    val sepiaFilteredImage = info.outputData.getByteArray("SEPIA_FILTERED_BYTEARRAY")
+                    //if (sepiaFilteredImage != null){
+                        val sepiaImage = BitmapFactory.decodeByteArray(sepiaFilteredImage, 0, sepiaFilteredImage!!.size)
+                        Glide.with(this).load(sepiaImage).fitCenter().circleCrop().into(current_avatar)
+                        val imageBody = imageToBody(sepiaImage)
+                        if (imageBody != null) {
+                            MainScope().launch {
+                               API.INSTANCE.userService.updateAvatar(imageBody)
+                            }
+                        }
+                    //}
+                }
+            })
     }
 
     private fun handlePictureChosen(data: Intent?) {
         if(data?.data == null) return
         val inputStream: InputStream? = contentResolver.openInputStream(data.data!!)
         val bmp = BitmapFactory.decodeStream(inputStream)
+        buildSepiaFilterRequest(data)
 
-        buildSepiaFilterRequests(data)
-
-        Glide.with(this).load(bmp).fitCenter().circleCrop().into(current_avatar)
+        /*Glide.with(this).load(bmp).fitCenter().circleCrop().into(current_avatar)
         val imageBody = imageToBody(bmp)
         if (imageBody == null) return
         MainScope().launch {
             API.INSTANCE.userService.updateAvatar(imageBody)
-        }
+        }*/
 
     }
 
@@ -140,27 +163,29 @@ class UserInfoActivity : AppCompatActivity() {
     private fun handlePhotoTaken(data: Intent?) {
         val image = data?.extras?.get("data") as? Bitmap
         if (data == null) return
-        buildSepiaFilterRequests(data)
-        Glide.with(this).load(image).fitCenter().circleCrop().into(current_avatar)
+        buildSepiaFilterRequest(data)
+        /*Glide.with(this).load(image).fitCenter().circleCrop().into(current_avatar)
         val imageBody = imageToBody(image)
         if (imageBody == null) return
         MainScope().launch {
             API.INSTANCE.userService.updateAvatar(imageBody)
-        }
+        }*/
     }
 
-    private fun buildSepiaFilterRequests(intent: Intent): List<OneTimeWorkRequest> {
-        val filterRequests = mutableListOf<OneTimeWorkRequest>()
+    private fun buildSepiaFilterRequest(intent: Intent): OneTimeWorkRequest {
+        /*val filterRequests = mutableListOf<OneTimeWorkRequest>()
 
-        intent.data?.run {
-            val filterWorkRequest = OneTimeWorkRequest.Builder(FilterWorker::class.java)
-                .setInputData(buildInputDataForFilter(this))
+
+
+        intent.data?.run {*/
+            /*val filterWorkRequest =*/ return OneTimeWorkRequest.Builder(FilterWorker::class.java)
+                .setInputData(buildInputDataForFilter(intent.data))
                 .build()
 
-            filterRequests.add(filterWorkRequest)
+            /*filterRequests.add(filterWorkRequest)
         }
-
-        return filterRequests
+*/
+        //return filterRequests
     }
 
     private fun buildInputDataForFilter(imageUri: Uri?): Data {
