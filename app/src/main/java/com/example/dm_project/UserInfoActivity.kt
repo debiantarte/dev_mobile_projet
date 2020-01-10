@@ -1,23 +1,30 @@
 package com.example.dm_project
 
 import android.Manifest
+import android.app.Application
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
+import android.os.Environment
 import android.provider.MediaStore
+import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
+import androidx.core.net.toUri
 import androidx.lifecycle.Observer
 import androidx.work.Data
 import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
+import androidx.work.WorkRequest
 import com.bumptech.glide.Glide
 import com.example.dm_project.network.API
+import com.example.dm_project.network.UserRepository
 import com.example.dm_project.worker.FilterWorker
 import com.example.dm_project.worker.KEY_IMAGE_URI
 import kotlinx.android.synthetic.main.activity_user_info.*
@@ -31,15 +38,18 @@ import java.io.File
 import java.io.FileNotFoundException
 import java.io.FileOutputStream
 import java.io.InputStream
+import java.text.SimpleDateFormat
+import java.util.*
 
 
 class UserInfoActivity : AppCompatActivity() {
-
     companion object {
         const val CAMERA_PERMISSION_CODE = 1000
         const val CAMERA_REQUEST_CODE = 2001
         const val PICK_IMAGE = 1001
     }
+
+    val userRepository = UserRepository()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -96,46 +106,55 @@ class UserInfoActivity : AppCompatActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (data == null) return
-        if(requestCode == CAMERA_REQUEST_CODE)
-            handlePhotoTaken(data)
-        else
-            handlePictureChosen(data)
+
         val workManager = WorkManager.getInstance()
-        val applySepiaFilter = buildSepiaFilterRequest(data)
 
-        workManager.enqueue(applySepiaFilter)
+        if (data.data != null) {
+            val applySepiaFilter = buildSepiaFilterRequest(data)
+            handleWorkRequest(workManager, applySepiaFilter)
+        }
+        else
+        {
+            userRepository.getAvatarUri().observe(this, Observer {
+                if (it != null)
+                {
+                    val applySepiaFilter = buildSepiaFilterRequest(it)
+                    handleWorkRequest(workManager, applySepiaFilter)
+                }
+            })
+        }
+    }
 
-        workManager.getWorkInfoByIdLiveData(applySepiaFilter.id)
+    private fun handleWorkRequest(manager: WorkManager, applySepiaFilter : OneTimeWorkRequest) {
+        manager.beginWith(applySepiaFilter).enqueue()
+
+        manager.getWorkInfoByIdLiveData(applySepiaFilter.id)
             .observe(this, Observer { info ->
                 if (info != null && info.state.isFinished) {
                     val sepiaFilteredImage = info.outputData.getByteArray("SEPIA_FILTERED_BYTEARRAY")
-                    //if (sepiaFilteredImage != null){
-                        val sepiaImage = BitmapFactory.decodeByteArray(sepiaFilteredImage, 0, sepiaFilteredImage!!.size)
-                        Glide.with(this).load(sepiaImage).fitCenter().circleCrop().into(current_avatar)
-                        val imageBody = imageToBody(sepiaImage)
-                        if (imageBody != null) {
-                            MainScope().launch {
-                               API.INSTANCE.userService.updateAvatar(imageBody)
-                            }
+                    val sepiaImage = BitmapFactory.decodeByteArray(sepiaFilteredImage, 0, sepiaFilteredImage!!.size)
+                    Glide.with(this).load(sepiaImage).fitCenter().circleCrop().into(current_avatar)
+                    val imageBody = imageToBody(sepiaImage)
+                    if (imageBody != null) {
+                        MainScope().launch {
+                            API.INSTANCE.userService.updateAvatar(imageBody)
                         }
-                    //}
+                    }
                 }
             })
     }
 
-    private fun handlePictureChosen(data: Intent?) {
-        if(data?.data == null) return
-        val inputStream: InputStream? = contentResolver.openInputStream(data.data!!)
-        val bmp = BitmapFactory.decodeStream(inputStream)
-        buildSepiaFilterRequest(data)
+    private fun handlePictureChosen(data: Intent?): OneTimeWorkRequest? {
+        if(data?.data == null) return null
+        return buildSepiaFilterRequest(data)
+    }
 
-        /*Glide.with(this).load(bmp).fitCenter().circleCrop().into(current_avatar)
-        val imageBody = imageToBody(bmp)
-        if (imageBody == null) return
-        MainScope().launch {
-            API.INSTANCE.userService.updateAvatar(imageBody)
-        }*/
-
+    private fun handlePhotoTaken(data: Intent?): OneTimeWorkRequest? {
+        if (data?.data == null) return null
+        val image = data.extras?.get("data") as? Bitmap
+        val uri = userRepository.getAvatarUri().value
+        if (uri == null) return null
+        return buildSepiaFilterRequest(uri)
     }
 
     // Vous pouvez ignorer cette fonction...
@@ -156,36 +175,19 @@ class UserInfoActivity : AppCompatActivity() {
         }
 
         val body = RequestBody.create(MediaType.parse("image/png"), f)
-        //val body = f.asRequestBody("image/png".toMediaTypeOrNull())
         return MultipartBody.Part.createFormData("avatar", f.path ,body)
     }
 
-    private fun handlePhotoTaken(data: Intent?) {
-        val image = data?.extras?.get("data") as? Bitmap
-        if (data == null) return
-        buildSepiaFilterRequest(data)
-        /*Glide.with(this).load(image).fitCenter().circleCrop().into(current_avatar)
-        val imageBody = imageToBody(image)
-        if (imageBody == null) return
-        MainScope().launch {
-            API.INSTANCE.userService.updateAvatar(imageBody)
-        }*/
-    }
-
     private fun buildSepiaFilterRequest(intent: Intent): OneTimeWorkRequest {
-        /*val filterRequests = mutableListOf<OneTimeWorkRequest>()
-
-
-
-        intent.data?.run {*/
-            /*val filterWorkRequest =*/ return OneTimeWorkRequest.Builder(FilterWorker::class.java)
+        return OneTimeWorkRequest.Builder(FilterWorker::class.java)
                 .setInputData(buildInputDataForFilter(intent.data))
                 .build()
+    }
 
-            /*filterRequests.add(filterWorkRequest)
-        }
-*/
-        //return filterRequests
+    private fun buildSepiaFilterRequest(uri: Uri): OneTimeWorkRequest {
+        return  OneTimeWorkRequest.Builder(FilterWorker::class.java)
+            .setInputData(buildInputDataForFilter(uri))
+            .build()
     }
 
     private fun buildInputDataForFilter(imageUri: Uri?): Data {
@@ -195,6 +197,4 @@ class UserInfoActivity : AppCompatActivity() {
         }
         return builder.build()
     }
-
-
 }

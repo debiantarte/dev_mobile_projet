@@ -26,7 +26,6 @@ class MainActivity : AppCompatActivity() {
 
         setContentView(R.layout.activity_main)
         val taskFormIntent = Intent(this, TaskFormActivity::class.java)
-
         val button = findViewById<FloatingActionButton>(R.id.floatingActionButton)
         button.setOnClickListener {
             startActivity(taskFormIntent)

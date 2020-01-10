@@ -1,14 +1,17 @@
 package com.example.dm_project
 
+import android.content.Context
+import android.content.Intent
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.ImageView
+import androidx.core.content.ContextCompat.startActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.example.dm_project.network.API
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 
-class TasksAdapter(private val tasks: MutableList<Task>) : RecyclerView.Adapter<TaskViewHolder>() {
+class TasksAdapter(private val tasks: MutableList<Task>, val context: Context) : RecyclerView.Adapter<TaskViewHolder>() {
     override fun getItemCount(): Int {
         return tasks.size
     }
@@ -19,9 +22,15 @@ class TasksAdapter(private val tasks: MutableList<Task>) : RecyclerView.Adapter<
 
     override fun onBindViewHolder(holder: TaskViewHolder, position: Int) {
         holder.bind(tasks[position])
+
         val deleteImage = holder.itemView.findViewById<ImageView>(R.id.task_delete)
         deleteImage.setOnClickListener{
             onDeleteClickListener(tasks[position])
+        }
+        val taskEditIntent = Intent(context, TaskEditActivity(tasks[position].id, tasks[position].description, tasks[position].title)::class.java)
+        val editImage = holder.itemView.findViewById<ImageView>(R.id.task_edit)
+        editImage.setOnClickListener{
+            context.startActivity(taskEditIntent)
         }
     }
 

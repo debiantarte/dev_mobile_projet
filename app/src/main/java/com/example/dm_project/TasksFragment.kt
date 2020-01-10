@@ -17,7 +17,7 @@ class TasksFragment : Fragment(){
     private val coroutineScope = MainScope()
     private val tasksRepository = TasksRepository()
     private val tasks = mutableListOf<Task>()
-    private val taskAdapter = TasksAdapter(tasks)
+    private lateinit var taskAdapter : TasksAdapter
     private val taskViewModel by lazy { ViewModelProviders.of(this).get(TasksViewModel::class.java)}
 
     override fun onCreateView(
@@ -25,8 +25,10 @@ class TasksFragment : Fragment(){
         container: ViewGroup?,
         savedInstanceState: Bundle?) : View?
     {
+        taskAdapter = TasksAdapter(tasks, context!!)
         val view = inflater.inflate(R.layout.tasks_fragment, container)
-        view.tasks_recycler_view.adapter = taskViewModel.tasksAdapter
+
+        view.tasks_recycler_view.adapter = taskAdapter
         view.tasks_recycler_view.layoutManager = LinearLayoutManager(context)
 
         return view
@@ -45,7 +47,14 @@ class TasksFragment : Fragment(){
     }
 
     override fun onResume() {
-        taskViewModel.loadTasks(this)
+        //taskViewModel.loadTasks(this)
+        tasksRepository.getTasks().observe(this, Observer {
+            if( it != null){
+                tasks.clear()
+                tasks.addAll(it)
+                taskAdapter.notifyDataSetChanged()
+            }
+        })
         super.onResume()
     }
 

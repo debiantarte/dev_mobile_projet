@@ -4,18 +4,22 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Color
-import android.media.effect.EffectFactory
 import android.net.Uri
-import android.preference.PreferenceManager
+import android.os.AsyncTask
 import android.provider.MediaStore
+import android.util.Log
+import androidx.core.net.toUri
 import androidx.work.Data
 import androidx.work.Worker
 import androidx.work.WorkerParameters
-import com.bumptech.glide.Glide
 import com.example.dm_project.network.API
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
+import java.io.BufferedInputStream
+import java.io.BufferedOutputStream
 import java.io.ByteArrayOutputStream
+import java.net.HttpURLConnection
+import java.net.URL
 
 const val KEY_IMAGE_URI = "IMAGE_URI"
 
@@ -24,20 +28,33 @@ class FilterWorker(val context: Context, workerParams: WorkerParameters) : Worke
     override fun doWork(): Result = try {
         val imageUriString = inputData.getString(KEY_IMAGE_URI)
 
-        val bitmap = MediaStore.Images.Media.getBitmap(applicationContext.contentResolver, Uri.parse(imageUriString))
-
-        if (bitmap == null) throw Exception("No avatar found!")
+        var bitmap : Bitmap
+        try {
+            bitmap = MediaStore.Images.Media.getBitmap(applicationContext.contentResolver, Uri.parse(imageUriString))
+            println("media store succeeded")
+        }
+        catch (e : Throwable)
+        {
+            println("media store failed")
+            val input = BufferedInputStream(URL(imageUriString).openConnection().getInputStream())
+            println("got past url connection")
+            val dataStream = ByteArrayOutputStream()
+            val output = BufferedOutputStream(dataStream)
+            input.copyTo(output)
+            output.flush()
+            val data = dataStream.toByteArray()
+            bitmap = BitmapFactory.decodeByteArray(data, 0, data.size)
+        }
+        println("bitmap initialized")
         val filteredBitmap = toSepia(bitmap)
 
-        val compressedBmp = getResizedBitmap(filteredBitmap, 150)
+        val compressedBmp = getResizedBitmap(filteredBitmap, 100)
 
         /* Bitmap -> Compressed ByteArray */
         val baos = ByteArrayOutputStream()
-        compressedBmp.compress(Bitmap.CompressFormat.JPEG, 10, baos)
+        compressedBmp.compress(Bitmap.CompressFormat.JPEG, 5, baos)
 
         val byteArray = baos.toByteArray()
-
-        println(byteArray.size)
 
         val output = Data.Builder().putByteArray("SEPIA_FILTERED_BYTEARRAY", byteArray).build()
 
@@ -45,6 +62,7 @@ class FilterWorker(val context: Context, workerParams: WorkerParameters) : Worke
     }
     catch (e: Throwable) {
         println(e.message)
+        e.printStackTrace()
         Result.failure()
     }
 

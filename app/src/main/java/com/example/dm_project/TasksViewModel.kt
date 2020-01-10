@@ -9,7 +9,7 @@ import com.example.dm_project.network.TasksRepository
 class TasksViewModel : ViewModel(){
     private val repository = TasksRepository()
     private var tasks = mutableListOf<Task>()
-    val tasksAdapter = TasksAdapter(tasks)
+    //val tasksAdapter = TasksAdapter(tasks, )
 
     fun loadTasks(lifecycle: LifecycleOwner) {
         repository.getTasks().observe(
@@ -18,7 +18,7 @@ class TasksViewModel : ViewModel(){
                 if(it==null)return@Observer
                 tasks.clear()
                 tasks.addAll(it)
-                tasksAdapter.notifyDataSetChanged()
+                //tasksAdapter.notifyDataSetChanged()
             }
         )
     }
