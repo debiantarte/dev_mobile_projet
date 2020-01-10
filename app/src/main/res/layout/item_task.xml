@@ -20,6 +20,13 @@
         android:layout_height="match_parent" />
 
     <ImageView
+        android:id="@+id/task_edit"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="0.3"
+        android:src="@android:drawable/ic_menu_edit" />
+
+    <ImageView
         android:id="@+id/task_delete"
         android:layout_width="0dp"
         android:layout_height="match_parent"

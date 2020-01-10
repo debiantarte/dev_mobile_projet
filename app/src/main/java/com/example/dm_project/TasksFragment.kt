@@ -1,5 +1,6 @@
 package com.example.dm_project
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
@@ -7,8 +8,10 @@ import android.view.LayoutInflater
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.dm_project.network.TasksRepository
+import kotlinx.android.synthetic.main.item_task.view.*
 import kotlinx.android.synthetic.main.tasks_fragment.view.*
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
@@ -28,7 +31,6 @@ class TasksFragment : Fragment(){
         val view = inflater.inflate(R.layout.tasks_fragment, container)
         view.tasks_recycler_view.adapter = taskViewModel.tasksAdapter
         view.tasks_recycler_view.layoutManager = LinearLayoutManager(context)
-
         return view
     }
 

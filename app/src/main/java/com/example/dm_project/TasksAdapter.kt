@@ -3,6 +3,8 @@ package com.example.dm_project
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.ImageView
+import androidx.navigation.fragment.NavHostFragment.findNavController
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.example.dm_project.network.API
 import kotlinx.coroutines.MainScope
